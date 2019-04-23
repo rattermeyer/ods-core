@@ -8,6 +8,7 @@ ENV SONAR_SCANNER_VERSION=3.1.0.1141 \
     TAILOR_VERSION=0.9.3
 
 ARG APP_DNS=192.168.99.100.nip.io
+ARG ENABLING_DNS=192.168.56.31.nip.io
 
 RUN yum -y install openssl 
 RUN yum -y install gnutls-utils
@@ -21,7 +22,10 @@ RUN yum -y install java-1.8.0-openjdk-devel.x86_64
 RUN echo ${APP_DNS}
 RUN gnutls-cli --insecure --print-cert ${APP_DNS} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /tmp/oc_app.crt
 
-# add root ca into cert store so OC can pick it up.
+RUN echo ${ENABLING_DNS}
+RUN gnutls-cli --insecure --print-cert ${ENABLING_DNS} </dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' >> /tmp/oc_app.crt
+
+# add root CAs into cert store so OC can pick it up.
 RUN cat /tmp/oc_app.crt >> /etc/ssl/certs/ca-bundle.trust.crt && \
 	cat /tmp/oc_app.crt >> /etc/ssl/certs/ca-bundle.crt
 
