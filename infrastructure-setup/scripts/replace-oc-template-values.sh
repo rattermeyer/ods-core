@@ -47,6 +47,9 @@ find . -iname "cm.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=changeme|PIPELINE
 find . -iname "bc.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=changeme|PIPELINE_TRIGGER_SECRET=$pipeline_trigger_secret|g" {} \;
 
 # OKD 3.11 has problems with internal name resolution of Docker Registry
+echo -e "Set docker registry for local development\n"
+find . -iname "*.env" -exec sed -i "s|DOCKER_REGISTRY=docker-registry.default.svc:5000|DOCKER_REGISTRY=$docker_registry_ip|g" {} \;
+
 
 #Provision Application
 echo -e "Set provision application crowd password\n"

@@ -13,6 +13,9 @@ clusterIp="192.168.56.101"
 bitbucketHost="https://cd_user@bitbucket.192.168.56.31.nip.io/scm"
 bitbucketHostIpPort="192.168.56.31:443"
 
+#Openshift local default Docker registry IP
+docker_registry_ip=172.30.1.1:5000
+
 #CD User
 cd_user_name="cd_user"
 cd_user_pw="cd_user"
@@ -48,6 +51,10 @@ echo -e "opendevstack" > ../ansible/.vault_pass.txt
 echo -e "\nOKD IP configuration\n"
 read -e -p "Enter your OpenShift Cluster IP and press [ENTER] (default: $clusterIp): " input
 clusterIp=${input:-$clusterIp}
+
+echo -e "\nOKD docker registry configuration\n"
+read -e -p "Enter your OpenShift Cluster internal Docker registry IP and press [ENTER] (default: $docker_registry_ip): " input
+docker_registry_ip=${input:-$docker_registry_ip}
 
 echo -e "\nBitbucket repo configuration\n"
 read -e -p "Enter your local Bitbucket installation repository path and press [ENTER] (default: $bitbucketHost): " input
@@ -103,7 +110,7 @@ bitbucket_ca_bundle=`openssl s_client -connect 192.168.56.31:443 -showcerts < /d
 #Openshift ClusterIp
 echo "#Configuration variables" | tee ${ODS_SAMPLE_DIR}/local.env.config
 echo "ODS_DIR=${ODS_SAMPLE_DIR}" >> ${ODS_SAMPLE_DIR}/local.env.config
-
+echo "docker_registry_ip=${docker_registry_ip}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "cluster_ip=${clusterIp}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "bitbucket_host=${bitbucketHost}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "bitbucket_ca_bundle=${bitbucket_ca_bundle}" >> ${ODS_SAMPLE_DIR}/local.env.config
