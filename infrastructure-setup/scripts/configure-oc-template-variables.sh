@@ -10,7 +10,8 @@ ODS_SAMPLE_DIR=`realpath ${ODS_DIR}`
 
 #Openshift ClusterIp
 clusterIp="192.168.56.101"
-bitbucketHost="http://cd_user@192.168.56.31:7990/scm"
+bitbucketHost="https://cd_user@bitbucket.192.168.56.31.nip.io/scm"
+bitbucketHostIpPort="192.168.56.31:443"
 
 #CD User
 cd_user_name="cd_user"
@@ -51,6 +52,9 @@ clusterIp=${input:-$clusterIp}
 echo -e "\nBitbucket repo configuration\n"
 read -e -p "Enter your local Bitbucket installation repository path and press [ENTER] (default: $bitbucketHost): " input
 bitbucketHost=${input:-$bitbucketHost}
+echo -e "Bitbucket host\n"
+read -e -p "Enter your bitbucketHostIp:Port to fetch the CA bundle from (default: $bitbucketHostIpPort): " input
+bitbucketHostIpPort=${input:-$bitbucketHostIpPort}
 
 echo -e "\nCD user configuration\n"
 read -e -p "Enter your CD user name [ENTER] (default: $cd_user_name): " input
@@ -74,7 +78,7 @@ sonarqube_database_password=${input:-$sonarqube_database_password}
 echo -e "\nRShiny configuration\n"
 read -e -p "Enter your RShiny user name and press [ENTER] (default: $crowd_rshiny_realm_user): " input
 crowd_rshiny_realm_user=${input:-$crowd_rshiny_realm_user}
-read -e -p "Enter your RShiny user name and press [ENTER] (default: $crowd_rshiny_realm_pw): " input
+read -e -p "Enter your RShiny password and press [ENTER] (default: $crowd_rshiny_realm_pw): " input
 crowd_rshiny_realm_pw=${input:-$crowd_rshiny_realm_pw}
 
 echo -e "Pipeline secret configuration\n"
@@ -94,12 +98,15 @@ provision_mail_pw=${input:-$provision_mail_pw}
 echo -e "\nWrite configuration to ${ODS_SAMPLE_DIR}/local.env.config\n"
 
 
+# Fetch Bitbucket CA Bundle
+bitbucket_ca_bundle=`openssl s_client -connect 192.168.56.31:443 -showcerts < /dev/null 2>/dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | base64 | sed ':a;N;$!ba;s/\n//g'`
 #Openshift ClusterIp
-echo "#Configuration variables" > ${ODS_SAMPLE_DIR}/local.env.config
+echo "#Configuration variables" | tee ${ODS_SAMPLE_DIR}/local.env.config
 echo "ODS_DIR=${ODS_SAMPLE_DIR}" >> ${ODS_SAMPLE_DIR}/local.env.config
 
 echo "cluster_ip=${clusterIp}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "bitbucket_host=${bitbucketHost}" >> ${ODS_SAMPLE_DIR}/local.env.config
+echo "bitbucket_ca_bundle=${bitbucket_ca_bundle}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "cd_user_name=${cd_user_name}" >> ${ODS_SAMPLE_DIR}/local.env.config
 cd_user_name_base64=`echo -n $cd_user_name | base64`
 echo "cd_user_name_base64=${cd_user_name_base64}" >> ${ODS_SAMPLE_DIR}/local.env.config

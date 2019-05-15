@@ -2,20 +2,31 @@
 - name: load var from file
   slurp:
     src: "{{ target_path }}"
+  ignore_errors: True
   register: imported_var
 
+- name: set daemon_json
+  set_fact:
+    daemon_json: "{{ {} | to_nice_json | b64encode }}"
+  when: imported_var.content is undefined
+
+- name: set daemon_json
+  set_fact:
+    daemon_json: "{{ imported_var.content }}"
+  when: imported_var.content is defined
+
 - debug:
-    msg: "{{ imported_var.content|b64decode|from_json }}"
+    msg: "{{ daemon_json | b64decode|from_json }}"
 
 - name: append more key/values
   set_fact:
-    imported_var: "{{ imported_var.content|b64decode|from_json | default([]) | combine( additional_json  ) }}"
+    daemon_json: "{{ daemon_json |default() |b64decode|from_json | default([]) | combine( additional_json  ) }}"
 
 - debug:
-    var: imported_var
+    var: daemon_json
 
 - name: write var to file
   copy: 
-    content: "{{ imported_var | to_nice_json }}" 
+    content: "{{ daemon_json | to_nice_json }}" 
     dest: "{{ target_path }}"
 

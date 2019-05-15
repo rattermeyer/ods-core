@@ -28,7 +28,7 @@
   tags: 
   - copy certs
   tasks:
-    - name: name:  
+    - name: 
       import_tasks: "tls-server-cert.yml"
       vars:
         cert_bundle:
@@ -46,11 +46,15 @@
           group: root
           mode: 0644
     
+# currently it seems, that custom CA is not yet supported
+# according to https://github.com/minishift/minishift/issues/2880
+# thus we need to get the generated CA cert to import this into your local browser
+# to get rid of the certificate warnings
 - hosts: openshift
   tags: 
   - copy certs
   tasks:
-    - name: name:  
+    - name: 
       import_tasks: "tls-server-cert.yml"
       vars:
         cert_bundle:

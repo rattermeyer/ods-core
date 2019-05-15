@@ -8,21 +8,13 @@
     become: True
     nginx_upstreams:
     - name: bitbucket
-      servers: {
-        "{{ upstreams.bitbucket }}"
-      }
+      servers: ["{{ upstreams.bitbucket }}"]
     - name: confluence
-      servers: {
-        "{{ upstreams.confluence }}"
-      }
+      servers: ["{{ upstreams.confluence }}"]
     - name: jira
-      servers: {
-        "{{ upstreams.jira }}"
-      }
+      servers: ["{{ upstreams.jira }}"]
     - name: crowd
-      servers: {
-        "{{ upstreams.crowd }}"
-      }
+      servers: ["{{ upstreams.crowd }}"]
     nginx_vhosts:
     - listen: "443 default_server ssl http2"
       server_name: "_"
@@ -60,6 +52,7 @@
       extra_parameters: |
         location / {
           proxy_pass http://crowd;
+          proxy_redirect http://crowd.{{ domain_name}}/crowd/ https://crowd.{{ domain_name }}/crowd/ ;
         }
     nginx_extra_http_options: |
       proxy_buffering    off;

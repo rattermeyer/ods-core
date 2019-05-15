@@ -10,7 +10,7 @@ ODS_CONFIG_DIR=`realpath ${ODS_DIR}/ods-configuration`
 echo ${ODS_SAMPLE_DIR}
 echo ${ODS_CONFIG_DIR}
 
-# check if we have a ods-configuration
+# check if we have an ods-configuration
 # and create one
 if [[ ! -d "${ODS_CONFIG_DIR}" ]] ; then
   echo "creating ods configuration directory"

@@ -14,6 +14,9 @@ find . -iname "*.env" -exec sed -i "s|192.168.99.100|$cluster_ip|g" {} \;
 echo -e "Replace repository base, set to $bitbucket_host \n"
 find . -iname "*.env" -exec sed -i "s|https://github.com|$bitbucket_host|g" {} \;
 
+echo -e "Replace ca.crt, set to $bitbucket_ca_bundle \n"
+find . -iname "*.env" -exec sed -i "s|bitbucket_ca_bundle_crt|$bitbucket_ca_bundle|g" {} \;
+
 echo -e "Set base64 encoded CD user name\n"
 find . -iname "*.env" -exec sed -i "s|CD_USER_ID=cd_user_base64|CD_USER_ID=$cd_user_name_base64|g" {} \;
 echo -e "Set base64 encoded CD user password\n"
@@ -37,11 +40,13 @@ echo -e "Set base64 encoded Crowd RShiny user password value\n"
 find . -iname "*.env" -exec sed -i "s|CROWD_RSHINY_REALM_PW=changeme_base64|CROWD_RSHINY_REALM_PW=$crowd_rshiny_realm_pw_base64|g" {} \;
 
 echo -e "Set base64 encoded pipeline trigger secret\n"
-find . -iname "*.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=changeme_base64|PIPELINE_TRIGGER_SECRET=$pipeline_trigger_secret_base64|g" {} \;
+find . -iname "*.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=\(.*\)|PIPELINE_TRIGGER_SECRET=$pipeline_trigger_secret_base64|g" {} \;
 
 echo -e "Set pipeline trigger secret\n"
 find . -iname "cm.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=changeme|PIPELINE_TRIGGER_SECRET=$pipeline_trigger_secret|g" {} \;
 find . -iname "bc.env" -exec sed -i "s|PIPELINE_TRIGGER_SECRET=changeme|PIPELINE_TRIGGER_SECRET=$pipeline_trigger_secret|g" {} \;
+
+# OKD 3.11 has problems with internal name resolution of Docker Registry
 
 #Provision Application
 echo -e "Set provision application crowd password\n"

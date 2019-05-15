@@ -32,15 +32,15 @@ cd ${cwd}/scripts
 
 echo "Step 4/9: Configure necessary parameters for the openshift cluster environment and templates"
 cd ${cwd}/scripts
-./configure-oc-template-variables.sh
+sh ./configure-oc-template-variables.sh
 
 echo "Step 5/9: Create configuration"
 cd ${cwd}/scripts
-./create-configuration-from-sample.sh
+sh ./create-configuration-from-sample.sh
 
 echo "Step 6/9: Replace ENV variables with preconfigured values"
 cd ${cwd}/scripts
-./replace-oc-template-values.sh
+sh ./replace-oc-template-values.sh
 
 echo "Step 7/9: Init local Git repository for configuration"
 cd ${OPENDEVSTACK_BASE_DIR}
@@ -63,7 +63,7 @@ cd ${cwd}
 
 echo "Before procedding with the installation in script ${cwd}/prepare-local-environment.sh , you will have to configure the atlassian tools and setup the CD user"
 echo "First you will have to configure Atlassian Crowd"
-echo "Crowd: http://192.168.56.31:8095/"
-echo "Jira: http://192.168.56.31:8080/"
-echo "Confluence: http://192.168.56.31:8090/"
-echo "Bitbucket: http://192.168.56.31:7990/"
+echo "Crowd: https://crowd.192.168.56.31.nip.io/"
+echo "Jira: http://jira.192.168.56.31.nip.io/"
+echo "Confluence: https://confluence.192.168.56.31.nip.io/"
+echo "Bitbucket: https://bitbucket.192.168.56.31.nip.io/"
