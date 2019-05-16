@@ -34,25 +34,28 @@
       extra_parameters: |
         location / {
           proxy_pass http://bitbucket;
+          proxy_redirect http:// $scheme://;
         }
     - listen: "443 ssl http2"
       server_name: "confluence.{{ domain_name }}"
       extra_parameters: |
         location / {
           proxy_pass http://confluence;
+          proxy_redirect http:// $scheme://;
         }
     - listen: "443 ssl http2"
       server_name: "jira.{{ domain_name }}"
       extra_parameters: |
         location / {
           proxy_pass http://jira;
+          proxy_redirect http:// $scheme://;
         }
     - listen: "443 ssl http2"
       server_name: "crowd.{{ domain_name }}"
       extra_parameters: |
         location / {
           proxy_pass http://crowd;
-          proxy_redirect http://crowd.{{ domain_name}}/crowd/ https://crowd.{{ domain_name }}/crowd/ ;
+          proxy_redirect http:// $scheme://;
         }
     nginx_extra_http_options: |
       proxy_buffering    off;
