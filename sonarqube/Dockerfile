@@ -44,11 +44,11 @@ RUN set -x \
     && rm sonarqube.zip* \
     && rm -rf $SONARQUBE_HOME/bin/*
 
+USER sonarqube
 VOLUME "$SONARQUBE_HOME/data"
 
 WORKDIR $SONARQUBE_HOME
 COPY run.sh $SONARQUBE_HOME/bin/
 COPY plugins /opt/configuration/sonarqube/plugins
 
-USER sonarqube
 ENTRYPOINT ["./bin/run.sh"]
