@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 #define variables
-base_dir="../../.."
+base_dir=`realpath ${OPENDEVSTACK_BASE_DIR:-../../..}`
 cwd=${PWD} 
 
 cd $base_dir
+echo "current dir=$(pwd)"
 
-source local.env.config
+source "${base_dir}/local.env.config"
 
 echo -e "Replace OKD cluster IP, set to $cluster_ip \n"
 find . -iname "*.env" -exec sed -i "s|192.168.99.100|$cluster_ip|g" {} \;

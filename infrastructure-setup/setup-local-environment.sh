@@ -7,7 +7,7 @@ cwd=${PWD}
 cd ../..
 
 #set base dir
-OPENDEVSTACK_BASE_DIR=${PWD}
+export OPENDEVSTACK_BASE_DIR=`realpath ${PWD}`
 
 #write base dir to local config file
 
@@ -42,28 +42,28 @@ echo "Step 6/9: Replace ENV variables with preconfigured values"
 cd ${cwd}/scripts
 sh ./replace-oc-template-values.sh
 
-echo "Step 7/9: Init local Git repository for configuration"
-cd ${OPENDEVSTACK_BASE_DIR}
-cd ods-configuration
-git init
-git add --all
-git commit -m "Initial configuration commit"
-git checkout -b production
-
-echo "Step 8/9: Setup and start VMs from Vagrant"
-#start vagrant
-cd ${cwd}
-vagrant up
-
-echo "Step 9/9: Base Installation with ansible"
-cd ${cwd}
-vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt ANSIBLE_LOG_PATH=ansible-\`date +%Y%m%d%H%M%S\`.log && ansible-playbook -v -i inventories/dev dev.yml"
-
-cd ${cwd}
-
-echo "Before procedding with the installation in script ${cwd}/prepare-local-environment.sh , you will have to configure the atlassian tools and setup the CD user"
-echo "First you will have to configure Atlassian Crowd"
-echo "Crowd: https://crowd.192.168.56.31.nip.io/"
-echo "Jira: http://jira.192.168.56.31.nip.io/"
-echo "Confluence: https://confluence.192.168.56.31.nip.io/"
-echo "Bitbucket: https://bitbucket.192.168.56.31.nip.io/"
+#echo "Step 7/9: Init local Git repository for configuration"
+#cd ${OPENDEVSTACK_BASE_DIR}
+#cd ods-configuration
+#git init
+#git add --all
+#git commit -m "Initial configuration commit"
+#git checkout -b production
+#
+#echo "Step 8/9: Setup and start VMs from Vagrant"
+##start vagrant
+#cd ${cwd}
+#vagrant up
+#
+#echo "Step 9/9: Base Installation with ansible"
+#cd ${cwd}
+#vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt ANSIBLE_LOG_PATH=ansible-\`date +%Y%m%d%H%M%S\`.log && ansible-playbook -v -i inventories/dev dev.yml"
+#
+#cd ${cwd}
+#
+#echo "Before procedding with the installation in script ${cwd}/prepare-local-environment.sh , you will have to configure the atlassian tools and setup the CD user"
+#echo "First you will have to configure Atlassian Crowd"
+#echo "Crowd: https://crowd.192.168.56.31.nip.io/"
+#echo "Jira: http://jira.192.168.56.31.nip.io/"
+#echo "Confluence: https://confluence.192.168.56.31.nip.io/"
+#echo "Bitbucket: https://bitbucket.192.168.56.31.nip.io/"
