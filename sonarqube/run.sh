@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "whoami : $(whoami)"
 set -e
 
 if [ "${1:0:1}" != '-' ]; then
