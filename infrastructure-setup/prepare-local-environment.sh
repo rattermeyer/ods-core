@@ -11,11 +11,11 @@ fi
 #Activate single sign on
 echo "Step 1/10: Enable Jira SSO"
 cd ${cwd}
-vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt && ansible-playbook -v -i inventories/dev playbooks/jira-enable-sso.yml"
+vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt ANSIBLE_LOG_PATH=ansible-\`date +%Y%m%d%H%M%S\`.log && ansible-playbook -v -i inventories/dev playbooks/jira-enable-sso.yml"
 
 echo "Step 2/10: Enable Confluence SSO"
 cd ${cwd}
-vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt && ansible-playbook -v -i inventories/dev playbooks/confluence-enable-sso.yml"
+vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt ANSIBLE_LOG_PATH=ansible-\`date +%Y%m%d%H%M%S\`.log && ansible-playbook -v -i inventories/dev playbooks/confluence-enable-sso.yml"
 
 echo "Step 3/10: Mirror repositories to ${TARGET_REPO_BASE}"
 cd ${cwd}/scripts

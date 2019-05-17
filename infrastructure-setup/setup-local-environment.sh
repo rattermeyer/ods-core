@@ -57,7 +57,7 @@ vagrant up
 
 echo "Step 9/9: Base Installation with ansible"
 cd ${cwd}
-vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt && ansible-playbook -v -i inventories/dev dev.yml"
+vagrant ssh atlcon -c "cd /vagrant/ansible/ && export ANSIBLE_VAULT_PASSWORD_FILE=/vagrant/ansible/.vault_pass.txt ANSIBLE_LOG_PATH=ansible-\`date +%Y%m%d%H%M%S\`.log && ansible-playbook -v -i inventories/dev dev.yml"
 
 cd ${cwd}
 
