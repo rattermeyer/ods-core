@@ -42,6 +42,8 @@
         location / {
           proxy_pass http://confluence;
           proxy_redirect http:// $scheme://;
+          proxy_read_timeout 180s;
+          proxy_send_timeout 180s;
         }
     - listen: "443 ssl http2"
       server_name: "jira.{{ domain_name }}"
@@ -66,6 +68,48 @@
       proxy_set_header   X_FORWARDED_PROTO https;
      
   tasks:
+  - name: Copy CA certificate
+    copy:
+      src: "/home/vagrant/pki/ca.pem"
+      dest: "/etc/ssl/opendevstack-local-ca.pem"
+    become: True
+    tags: cacerts
+  - name: Import server certificate
+    java_cert:
+      cert_url: 192.168.56.31.nip.io
+      cert_port: 443
+      keystore_path: "{{ item }}"
+      keystore_pass: changeit
+      state: present
+    with_items:
+    - /etc/alternatives/jre/lib/security/cacerts
+    - /opt/atlassian/confluence/jre/lib/security/cacerts
+    - /opt/atlassian/jira/jre/lib/security/cacerts
+    become: True
+    notify: 
+    - restart crowd service
+    - restart bitbucket service
+    - restart confluence service
+    - restart jira service
+    tags: cacerts
+  - name: Import self-signed CA certificate
+    java_cert:
+      cert_path: "/etc/ssl/opendevstack-local-ca.pem"
+      cert_alias: "opendevstack-local-ca"
+      keystore_path: "{{ item }}"
+      keystore_pass: changeit
+      state: present
+    with_items:
+    - /etc/alternatives/jre/lib/security/cacerts
+    - /opt/atlassian/confluence/jre/lib/security/cacerts
+    - /opt/atlassian/jira/jre/lib/security/cacerts
+    become: True
+    notify: 
+    - restart crowd service
+    - restart bitbucket service
+    - restart confluence service
+    - restart jira service
+    tags: cacerts
   - name: update bitbucket properties
     blockinfile:
       path: /srv/atlassian/bitbucket/shared/bitbucket.properties
@@ -125,25 +169,25 @@
 
   handlers:
   - name: restart bitbucket service
-    service:
-       name: atlbitbucket
-       state: restarted
-    become: True
+    import_tasks: tasks/restart-service.yml
+    vars:
+      service: atlbitbucket
+      port: 7990
   - name: restart confluence service
-    service:
-       name: confluence
-       state: restarted
-    become: True
+    import_tasks: tasks/restart-service.yml
+    vars:
+      service: confluence
+      port: 8090
   - name: restart jira service
-    service:
-       name: jira
-       state: restarted
-    become: True
+    import_tasks: tasks/restart-service.yml
+    vars:
+      service: jira
+      port: 8080
   - name: restart crowd service
-    service:
-       name: crowd
-       state: restarted
-    become: True
+    import_tasks: tasks/restart-service.yml
+    vars:
+      service: crowd
+      port: 8095
    
   vars:
     upstreams:

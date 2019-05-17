@@ -1,0 +1,30 @@
+---
+# variables:
+# port
+# service
+- block:
+  - name: "check if {{service}} is running"
+    wait_for:
+      port: "{{ port }}"
+      delay: 5
+      timeout: 10
+      msg: "Timeout waiting for {{ port }} to respond"
+    register: port_check
+    ignore_errors: yes
+  # it is not clear to me why service stop is not working correctly
+  - name: "stop {{ service }}"
+    command: "service {{ service }} stop"
+    when: port_check.failed == False
+    args:
+      warn: false
+  - name: "wait for {{ service }} to be stopped"
+    wait_for:
+      port: "{{ port }}"
+      delay: 30
+      state: absent
+  # it is not clear to me why service stop is not working correctly
+  - name: "start {{ service }}"
+    command: "service {{ service }} start"
+    args:
+      warn: false
+  become: True
