@@ -239,12 +239,9 @@ objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
-    creationTimestamp: null
-    labels:
-      app: sonarqube
     name: sonarqube
+    namespace: cd
   spec:
-    dockerImageRepository: sonarqube
     lookupPolicy:
       local: false
 - apiVersion: v1
