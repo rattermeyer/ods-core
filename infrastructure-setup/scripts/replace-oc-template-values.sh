@@ -18,6 +18,8 @@ find . -iname "*.env" -exec sed -i "s|https://github.com|$bitbucket_host|g" {} \
 echo -e "Replace ca.crt, set to $bitbucket_ca_bundle \n"
 find . -iname "*.env" -exec sed -i "s|bitbucket_ca_bundle_crt|$bitbucket_ca_bundle|g" {} \;
 
+echo -e "Set CROWD URL\n"
+find . -iname "*.env" -exec sed -i "s|CROWD_URL=\(.*\)|CROWD_URL=$crowd_url|g" {} \;
 echo -e "Set base64 encoded CD user name\n"
 find . -iname "*.env" -exec sed -i "s|CD_USER_ID=cd_user_base64|CD_USER_ID=$cd_user_name_base64|g" {} \;
 echo -e "Set base64 encoded CD user password\n"

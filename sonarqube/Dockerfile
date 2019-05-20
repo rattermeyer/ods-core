@@ -1,54 +1,54 @@
-FROM openjdk:8
+FROM openjdk:8-alpine
 
-ENV SONAR_VERSION=7.7 \
+ENV SONAR_VERSION=7.3 \
     SONARQUBE_HOME=/opt/sonarqube \
-    # Database configuration
-    # Defaults to using H2
-    # DEPRECATED. Use -v sonar.jdbc.username=... instead
-    # Drop these in the next release, also in the run script
     SONARQUBE_JDBC_USERNAME=sonar \
     SONARQUBE_JDBC_PASSWORD=sonar \
-    SONARQUBE_JDBC_URL=
+    SONARQUBE_JDBC_URL= \
+    CROWD_HOST_PORT=crowd.192.168.56.31.nip.io:443 
 
 # Http port
 EXPOSE 9000
 
-RUN groupadd -r sonarqube && useradd -r -g root sonarqube
-
-# grab gosu for easy step-down from root
-RUN set -x \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/1.10/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/1.10/gosu-$(dpkg --print-architecture).asc" \
-    #&& export GNUPGHOME="$(mktemp -d)" \
-    #&& (gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    #    || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4) \
-    #&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    # && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
+RUN adduser -S -G root sonarqube
 
 RUN set -x \
+    && apk add --no-cache gnupg unzip \
+    && apk add --no-cache libressl wget \
+    && apk add --no-cache su-exec \
+    && apk add --no-cache bash \
     # pub   2048R/D26468DE 2015-05-25
     #       Key fingerprint = F118 2E81 C792 9289 21DB  CAB4 CFCA 4A29 D264 68DE
     # uid                  sonarsource_deployer (Sonarsource Deployer) <infra@sonarsource.com>
     # sub   2048R/06855C1D 2015-05-25
-    #&& (gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE \
-    #	    || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE) \
+    # && if [[ $HTTP_PROXY != "" ]]; then gpg --keyserver ha.pool.sks-keyservers.net --keyserver-options "timeout=10 http-proxy=$http_proxy" --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE; else gpg --keyserver ha.pool.sks-keyservers.net --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE; fi \
+    && mkdir -p /opt \
     && cd /opt \
-    && curl -o sonarqube.zip -fSL https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip \
-    && curl -o sonarqube.zip.asc -fSL https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip.asc \
-    #&& gpg --batch --verify sonarqube.zip.asc sonarqube.zip \
+    && wget -O sonarqube.zip --no-verbose https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip \
+    # && wget -O sonarqube.zip.asc --no-verbose https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip.asc \
+    # && gpg --batch --verify sonarqube.zip.asc sonarqube.zip \
     && unzip sonarqube.zip \
     && mv sonarqube-$SONAR_VERSION sonarqube \
-    && chown -R sonarqube:sonarqube sonarqube \
+    && chown -R sonarqube:root sonarqube \
+    && chmod -R g+w sonarqube \
     && rm sonarqube.zip* \
-    && rm -rf $SONARQUBE_HOME/bin/*
+    && rm -rf $SONARQUBE_HOME/bin/* \
+    && openssl s_client -connect ${CROWD_HOST_PORT} -showcerts < /dev/null 2>/dev/null| sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /etc/ssl/certs/crowd.crt \
+    && keytool -import -noprompt -trustcacerts -file /etc/ssl/certs/crowd.crt -alias crowd -keystore /etc/ssl/certs/java/cacerts -storepass changeit \
+    && mkdir -p /opt/configuration/sonarqube \
+    && chown -R sonarqube:root /opt/configuration/sonarqube
+
+COPY run.sh $SONARQUBE_HOME/bin/
+COPY plugins /opt/configuration/sonarqube/plugins
+COPY fix-permissions /usr/bin
+RUN /usr/bin/fix-permissions /opt/sonarqube \
+   && /usr/bin/fix-permissions /opt/configuration 
+
+USER sonarqube
 
 VOLUME "$SONARQUBE_HOME/data"
 
 WORKDIR $SONARQUBE_HOME
-COPY run.sh $SONARQUBE_HOME/bin/
-COPY plugins /opt/configuration/sonarqube/plugins
 
-USER sonarqube
+
 ENTRYPOINT ["./bin/run.sh"]

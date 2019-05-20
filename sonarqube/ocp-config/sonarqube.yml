@@ -175,31 +175,31 @@ objects:
               configMapKeyRef:
                 key: database-jdbc-url
                 name: sonarqube
-          - name: SONARQUBE_JDBC_USERNAME
-            valueFrom:
-              configMapKeyRef:
-                key: database-user
-                name: sonarqube
           - name: SONARQUBE_JDBC_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: database-password
                 name: sonarqube-postgresql
-          - name: SONARQUBE_CROWD_URL
+          - name: SONARQUBE_JDBC_USERNAME
             valueFrom:
               configMapKeyRef:
-                key: crowd-url
-                name: sonarqube
-          - name: SONARQUBE_CROWD_APP
-            valueFrom:
-              configMapKeyRef:
-                key: crowd-application
+                key: database-user
                 name: sonarqube
           - name: SONARQUBE_CROWD_PWD
             valueFrom:
               secretKeyRef:
                 key: crowd-password
                 name: sonarqube-app
+          - name: SONARQUBE_CROWD_APP
+            valueFrom:
+              configMapKeyRef:
+                key: crowd-application
+                name: sonarqube
+          - name: SONARQUBE_CROWD_URL
+            valueFrom:
+              configMapKeyRef:
+                key: crowd-url
+                name: sonarqube
           imagePullPolicy: Always
           ports:
           - containerPort: 9000
@@ -239,9 +239,12 @@ objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
+    creationTimestamp: null
+    labels:
+      app: sonarqube
     name: sonarqube
-    namespace: cd
   spec:
+    dockerImageRepository: sonarqube
     lookupPolicy:
       local: false
 - apiVersion: v1

@@ -20,6 +20,9 @@ docker_registry_ip=172.30.1.1:5000
 cd_user_name="cd_user"
 cd_user_pw="cd_user"
 
+#CROWD
+crowd_url="https://crowd.192.168.56.31.nip.io/crowd"
+
 #Nexus
 nexus_password="developer"
 
@@ -62,6 +65,10 @@ bitbucketHost=${input:-$bitbucketHost}
 echo -e "Bitbucket host\n"
 read -e -p "Enter your bitbucketHostIp:Port to fetch the CA bundle from (default: $bitbucketHostIpPort): " input
 bitbucketHostIpPort=${input:-$bitbucketHostIpPort}
+
+echo -e "\nCROWD configuration\n"
+read -e -p "Enter your CROWD URL [ENTER] (default: $crowd_url):" input
+crowd_url=${input:-$crowd_url}
 
 echo -e "\nCD user configuration\n"
 read -e -p "Enter your CD user name [ENTER] (default: $cd_user_name): " input
@@ -114,6 +121,8 @@ echo "docker_registry_ip=${docker_registry_ip}" >> ${ODS_SAMPLE_DIR}/local.env.c
 echo "cluster_ip=${clusterIp}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "bitbucket_host=${bitbucketHost}" >> ${ODS_SAMPLE_DIR}/local.env.config
 echo "bitbucket_ca_bundle=${bitbucket_ca_bundle}" >> ${ODS_SAMPLE_DIR}/local.env.config
+echo "crowd_url=${crowd_url}" >> ${ODS_SAMPLE_DIR}/local.env.config
+
 echo "cd_user_name=${cd_user_name}" >> ${ODS_SAMPLE_DIR}/local.env.config
 cd_user_name_base64=`echo -n $cd_user_name | base64`
 echo "cd_user_name_base64=${cd_user_name_base64}" >> ${ODS_SAMPLE_DIR}/local.env.config
