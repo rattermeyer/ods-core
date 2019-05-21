@@ -1,4 +1,5 @@
-FROM registry.access.redhat.com/openshift3/jenkins-2-rhel7
+FROM openshift/jenkins-2-centos7:v3.11
+#FROM registry.access.redhat.com/openshift3/jenkins-2-rhel7
 
 ARG APP_DNS=192.168.99.100.nip.io
 ARG ENABLING_DNS=192.168.56.31.nip.io
