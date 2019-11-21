@@ -16,7 +16,7 @@
       become: True
     - name: download openshift install script
       get_url:
-        url: "https://raw.githubusercontent.com/gshipley/installcentos/master/install-openshift.sh"
+        url: "https://raw.githubusercontent.com/okd-community-install/installcentos/master/install-openshift.sh"
         dest: "/tmp/install-openshift.sh"
         owner: root
         group: root
